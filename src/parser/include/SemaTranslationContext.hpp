@@ -17,6 +17,7 @@ namespace dlp {
 			Scope *pushScope() {
 				Scope *result;
 				currentScope->children.emplace_back(result = new Scope(currentScope));
+				currentScope = result;
 				return result;
 			}
 			void popScope() {

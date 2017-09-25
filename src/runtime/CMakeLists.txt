@@ -6,3 +6,5 @@ file(GLOB runtime_SOURCE_FILES src/*.cpp)
 file(GLOB runtime_HEADER_FILES include/*.hpp)
 add_library(dlprt SHARED ${runtime_SOURCE_FILES} ${runtime_HEADER_FILES})
 target_link_libraries (dlprt ${DYNLOAD_LIBRARY})
+
+		

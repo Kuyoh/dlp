@@ -17,6 +17,8 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/Scalar/GVN.h>
+#include <iostream>
+#include "SemaAstPrinter.hpp"
 #include "DlpJit.hpp"
 #include "DlpParser.hpp"
 #include "DlpCodeGen.hpp"
@@ -55,6 +57,8 @@ DlpJitEngine::~DlpJitEngine() {
 
 void DlpJitEngine::add(const char *filename) {
 	auto ast = data->analyzer.analyze(data->parser.parse(filename));
+	
+	printAst(std::cout, *ast.program);
 
 	data->workingModule = llvm::make_unique<llvm::Module>("jit-module", data->context);
 	data->workingModule->setDataLayout(data->jit.getDataLayout());

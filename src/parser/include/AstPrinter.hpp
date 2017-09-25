@@ -1,11 +1,11 @@
 #pragma once
 #include <iostream>
 #include "AstVisitor.hpp"
-#include "OperatorTypes.hpp"
+#include "AstPrintingContext.hpp"
 
 namespace dlp {
 	struct PrintVisitor : ast::Visitor {
-		PrintVisitor(std::ostream &o) : o(o) {}
+		PrintVisitor(std::ostream &o) : context(o) {}
 
 		void visit(ast::StringLiteral &n) override;
 		void visit(ast::HexLiteral &n) override;
@@ -33,19 +33,6 @@ namespace dlp {
 		void visit(ast::ConstantDefinition &n) override;
 
 	protected:
-		std::ostream &o;
-		int indent = -1;
-
-		void startNode(const char *name);
-		void endNode();
-		void writeIndent();
-		void printNode(const char *name, ast::INode &n);
-		const char *unOpToken2Str(UnaryOperatorType token);
-		const char *binOpToken2Str(BinaryOperatorType token);
-
-		template <typename T> void printValue(const char *name, T value) {
-			writeIndent();
-			o << name << "[" << value << "]" << std::endl;
-		}
+		PrintingContext context;
 	};
 }

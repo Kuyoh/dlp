@@ -1,11 +1,11 @@
 #pragma once
 
-#ifdef DLP_BUILD_JIT
-#define DLP_JIT_API __declspec(dllexport)
-#else
-#define DLP_JIT_API __declspec(dllimport)
-#endif
-
+#define DLP_JIT_API
+//#ifdef DLP_BUILD_JIT
+//#define DLP_JIT_API __declspec(dllexport)
+//#else
+//#define DLP_JIT_API __declspec(dllimport)
+//#endif
 
 class DLP_JIT_API DlpJitEngine {
 public:

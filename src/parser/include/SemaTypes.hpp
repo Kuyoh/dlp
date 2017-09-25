@@ -60,7 +60,7 @@ namespace dlp {
 		struct FunctionType : Type {
 			struct Argument { std::string name; Type *type = nullptr; Entity *defaultVal = nullptr; };
 			FunctionType(std::vector<Argument> &&arguments, std::vector<Argument> &&results, bool isVarArg = false) :
-				Type(Kind::FUNCTIONTYPE), arguments(std::move(arguments)), results(results), isvarArg(isvarArg)
+				Type(Kind::FUNCTIONTYPE), arguments(std::move(arguments)), results(results), isVarArg(isVarArg)
 			{}
 			static bool classof(const Entity *e) {
 				return e->getKind() == Kind::FUNCTIONTYPE;
@@ -69,7 +69,7 @@ namespace dlp {
 
 			std::vector<Argument> arguments;
 			std::vector<Argument> results;
-			bool isvarArg;
+			bool isVarArg;
 		};
 		struct PointerType : Type {
 			PointerType(Type *elementType) : Type(Kind::POINTERTYPE), elementType(elementType) {}
