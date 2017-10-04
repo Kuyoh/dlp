@@ -1,7 +1,7 @@
 %{
 #include <string>
 #include "parser.hpp"
-#include "GenLexer.hpp"
+#include "DlpLexer.hpp"
 
 #undef  YY_DECL
 #define YY_DECL int dlp::Lexer::yylex(dlp::Parser::semantic_type *lval, dlp::Parser::location_type *lloc)

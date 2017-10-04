@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DLP_PARSER_OPERATORTYPES_HPP
+#define DLP_PARSER_OPERATORTYPES_HPP
 
 namespace dlp {
 	enum class UnaryOperatorType {
@@ -21,3 +22,4 @@ namespace dlp {
 	const char *unOpToken2Str(UnaryOperatorType type);
 	const char *binOpToken2Str(BinaryOperatorType type);
 }
+#endif

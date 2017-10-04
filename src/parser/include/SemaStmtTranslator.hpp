@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_SEMAVISITOR_HPP
+#define DLP_PARSER_SEMAVISITOR_HPP
+
 #include "ast.hpp"
 #include "AstVisitor.hpp"
 #include "SemaTranslationContext.hpp"
@@ -32,3 +34,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

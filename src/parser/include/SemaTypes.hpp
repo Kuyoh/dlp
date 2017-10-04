@@ -1,4 +1,7 @@
-#pragma once
+#ifndef DLP_PARSER_SEMATYPES_HPP
+#define DLP_PARSER_SEMATYPES_HPP
+
+#include <string>
 #include <memory>
 #include "SemaEntity.hpp"
 
@@ -115,3 +118,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

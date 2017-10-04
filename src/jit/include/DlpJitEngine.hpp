@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DLP_JIT_DLPJITENGINE_HPP
+#define DLP_JIT_DLPJITENGINE_HPP
 
 #define DLP_JIT_API
 //#ifdef DLP_BUILD_JIT
@@ -19,3 +20,4 @@ private:
 	struct Data;
 	Data *data;
 };
+#endif

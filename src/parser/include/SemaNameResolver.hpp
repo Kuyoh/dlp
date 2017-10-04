@@ -1,3 +1,6 @@
+#ifndef DLP_PARSER_SEMANAMERESOLVER_HPP
+#define DLP_PARSER_SEMANAMERESOLVER_HPP
+
 #include "SemaEntityVisitor.hpp"
 #include "SemaTranslationContext.hpp"
 #include "SemaStatementVisitor.hpp"
@@ -46,3 +49,4 @@ namespace dlp {
         };
     }
 }
+#endif

@@ -1,7 +1,9 @@
-#include <dynload.h>
-#include <unordered_map>
 #define BUILD_DLPRT_API
 #include "Libraries.hpp"
+#include <map>
+#include <string>
+#include <cstdlib>
+#include <dynload.h>
 
 struct Libraries {
 	struct Library {
@@ -19,7 +21,7 @@ struct Libraries {
 		}
 		DLLib *pLib = nullptr;
 		std::string libName;
-		std::unordered_map<std::string, void*> symbols;
+		std::map<std::string, void*> symbols;
 	};
 
 	Library &get(const char *name) {
@@ -34,7 +36,7 @@ struct Libraries {
 		}
 		return libs[name];
 	}
-	std::unordered_map<std::string, Library> libs;
+	std::map<std::string, Library> libs;
 } libraries;
 
 extern "C" void *findDynSymbol(const char *libName, const char *symName) {

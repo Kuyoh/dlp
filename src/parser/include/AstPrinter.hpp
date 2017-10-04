@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_ASTPRINTER_HPP
+#define DLP_PARSER_ASTPRINTER_HPP
+
 #include <iostream>
 #include "AstVisitor.hpp"
 #include "AstPrintingContext.hpp"
@@ -36,3 +38,4 @@ namespace dlp {
 		PrintingContext context;
 	};
 }
+#endif

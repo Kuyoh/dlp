@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_SEMAENTITY_HPP
+#define DLP_PARSER_SEMAENTITY_HPP
+
 #include <vector>
 #include "SemaEntityVisitor.hpp"
 
@@ -119,3 +121,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

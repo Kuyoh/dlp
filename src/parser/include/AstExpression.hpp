@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_ASTEXPRESSION_HPP
+#define DLP_PARSER_ASTEXPRESSION_HPP
+
 #include "AstNode.hpp"
 #include "OperatorTypes.hpp"
 
@@ -106,3 +108,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

@@ -1,10 +1,12 @@
-#pragma once
+#ifndef DLP_JIT_DLPCODEGEN_HPP
+#define DLP_JIT_DLPCODEGEN_HPP
+
 #include <string>
 #include <llvm/IR/Module.h>
 #include "DlpAnalyzer.hpp"
 
 namespace dlp {
-	constexpr char *ENTRY_FUNC_NAME = "__entry";
+	constexpr const char *ENTRY_FUNC_NAME = "__entry";
 
 	//class DlpCodeGen {
 	//public:
@@ -18,3 +20,4 @@ namespace dlp {
 	//	Data *data;
 	//};
 }
+#endif

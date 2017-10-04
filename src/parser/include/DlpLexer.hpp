@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DLP_PARSER_DLPLEXER_HPP
+#define DLP_PARSER_DLPLEXER_HPP
 
 #if !defined(yyFlexLexerOnce)
 #include <FlexLexer.h>
@@ -24,3 +25,4 @@ namespace dlp {
 		Parser::location_type *yylloc = nullptr;
 	};
 }
+#endif

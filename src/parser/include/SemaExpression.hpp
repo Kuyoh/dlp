@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_SEMAEXPRESSION_HPP
+#define DLP_PARSER_SEMAEXPRESSION_HPP
+
 #include <list>
 #include <vector>
 #include "SemaTypes.hpp"
@@ -71,3 +73,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

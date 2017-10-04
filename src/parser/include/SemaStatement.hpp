@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_SEMASTATEMENT_HPP
+#define DLP_PARSER_SEMASTATEMENT_HPP
+
 #include <list>
 #include <memory>
 #include "SemaExpression.hpp"
@@ -76,3 +78,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

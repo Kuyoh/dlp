@@ -3,7 +3,7 @@
 
 using namespace dlp::sema;
 
-auto getEntities() {
+std::unordered_map<std::string, std::shared_ptr<Entity>> getEntities() {
 	std::unordered_map<std::string, std::shared_ptr<Entity>> entities = {
 		{ "bool",  std::make_shared<BoolType>() },
 		{ "u8",  std::make_shared<IntType>(Type::B8 , false) },

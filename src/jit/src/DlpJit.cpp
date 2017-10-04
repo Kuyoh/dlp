@@ -14,9 +14,7 @@
 #include "llvm/ExecutionEngine/Orc/CompileUtils.h"
 #include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
 #include "llvm/ExecutionEngine/Orc/LazyEmittingLayer.h"
-#include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
 #include "llvm/Support/raw_os_ostream.h"
-//#include "llvm/ExecutionEngine/Orc/RTDyldObjectLinkingLayer.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Mangler.h"
@@ -80,8 +78,8 @@ struct DlpJit::Data{
 	//llvm::ExecutionEngine *ee;
 	std::unique_ptr<llvm::TargetMachine> tm;
 	const llvm::DataLayout dl;
-	llvm::orc::ObjectLinkingLayer<> objectLayer;
-	llvm::orc::IRCompileLayer<decltype(objectLayer)> compileLayer;
+	DlpJit::ObjectLayer objectLayer;
+	DlpJit::CompileLayer compileLayer;
 
 	using OptimizeFunction =
 		std::function<std::shared_ptr<llvm::Module>(std::shared_ptr<llvm::Module>)>;
@@ -110,12 +108,13 @@ struct DlpJit::Data{
 		//PM->add(llvm::createPrintModulePass(os));
 		//PM->run(*m);
 
-		return m;
+		return std::move(m);
 	}
 
 	Data() : tm(llvm::EngineBuilder().selectTarget()), dl(tm->createDataLayout()),
+		objectLayer([]() { return std::make_shared<llvm::SectionMemoryManager>(); }),
 		compileLayer(objectLayer, llvm::orc::SimpleCompiler(*tm)), dlprtLib(dl),
-		optimizeLayer(compileLayer, [this](auto m) { return optimize(m); })
+		optimizeLayer(compileLayer, [this](std::shared_ptr<llvm::Module> m) { return optimize(std::move(m)); })
 	{
 	}
 };
@@ -124,9 +123,6 @@ DlpJit::DlpJit() : data(new Data) {}
 DlpJit::~DlpJit() { delete data; }
 
 DlpJit::ModuleH DlpJit::addModule(std::unique_ptr<llvm::Module> m) {
-	std::vector<std::shared_ptr<llvm::Module>> modules;
-	modules.emplace_back(m.release());
-	
 	auto resolver = llvm::orc::createLambdaResolver(
 		[=](const std::string &name) {
 		if (auto Sym = data->optimizeLayer.findSymbol(name, false))
@@ -150,8 +146,7 @@ DlpJit::ModuleH DlpJit::addModule(std::unique_ptr<llvm::Module> m) {
 
 	//data->objectLayer.
 	//ee->addGlobalMapping(printfFcnt, libraries.get("msvcrt.dll").findSymbol("printf"));
-	return data->optimizeLayer.addModuleSet(std::move(modules),
-		std::make_unique<llvm::SectionMemoryManager>(), std::move(resolver));
+	return llvm::cantFail(data->optimizeLayer.addModule(std::move(m), std::move(resolver)));
 }
 
 llvm::DataLayout DlpJit::getDataLayout() {
@@ -159,7 +154,7 @@ llvm::DataLayout DlpJit::getDataLayout() {
 }
 
 void DlpJit::removeModule(DlpJit::ModuleH m) {
-	data->optimizeLayer.removeModuleSet(m);
+	data->optimizeLayer.removeModule(m);
 }
 
 DlpJit::Symbol DlpJit::findSymbol(const std::string &name) {

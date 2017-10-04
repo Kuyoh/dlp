@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DLP_RT_LIBRARIES_HPP
+#define DLP_RT_LIBRARIES_HPP
 
 #if defined(BUILD_DLPRT_API) && defined(HAVE_VISIBILITY)
 #define DLPRT_API __attribute__((__visibility__("default")))
@@ -13,3 +14,4 @@
 // TODO: we need to figure out a way to free the library even when the dll is still loaded (maybe via thread_attach/detach?)
 extern "C" DLPRT_API void *findDynSymbol(const char *libName, const char *symName);
 
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DLP_PARSER_SEMASTATEMENTVISITOR_HPP
+#define DLP_PARSER_SEMASTATEMENTVISITOR_HPP
 
 namespace dlp {
     namespace sema {
@@ -20,3 +21,4 @@ namespace dlp {
         };
     }
 }
+#endif

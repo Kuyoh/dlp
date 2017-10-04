@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DLP_PARSER_ASTVISITOR_HPP
+#define DLP_PARSER_ASTVISITOR_HPP
 
 namespace dlp {
 	namespace ast {
@@ -67,3 +68,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

@@ -1,8 +1,8 @@
 #include <iterator>
 #include <fstream>
 #include "DlpParser.hpp"
-#include "AstPrintVisitor.hpp"
-#include "GenLexer.hpp"
+#include "AstPrinter.hpp"
+#include "DlpLexer.hpp"
 #include "parser.hpp"
 
 using namespace dlp;

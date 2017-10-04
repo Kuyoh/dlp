@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_ASTSTATEMENT_HPP
+#define DLP_PARSER_ASTSTATEMENT_HPP
+
 #include "AstNode.hpp"
 #include "AstExpression.hpp"
 
@@ -128,3 +130,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

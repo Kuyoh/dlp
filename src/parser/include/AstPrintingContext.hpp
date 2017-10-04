@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_ASTPRINTINCONTEXT_HPP
+#define DLP_PARSER_ASTPRINTINCONTEXT_HPP
+
 #include <ostream>
 #include "OperatorTypes.hpp"
 
@@ -26,3 +28,4 @@ namespace dlp {
 		}
 	};
 }
+#endif

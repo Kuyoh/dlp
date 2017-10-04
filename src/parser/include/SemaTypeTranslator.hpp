@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_SEMATYPETRANSLATOR_HPP
+#define DLP_PARSER_SEMATYPETRANSLATOR_HPP
+
 #include "ast.hpp"
 #include <memory>
 #include "AstVisitor.hpp"
@@ -25,3 +27,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

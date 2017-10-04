@@ -1,6 +1,9 @@
-#pragma once
+#ifndef DLP_PARSER_SEMAPROGRAM_HPP
+#define DLP_PARSER_SEMAPROGRAM_HPP
+
 #include <list>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include "SemaStatement.hpp"
 
@@ -19,3 +22,4 @@ namespace dlp {
 		using Program = Scope;
 	}
 }
+#endif

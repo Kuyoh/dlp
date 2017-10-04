@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_SEMATRANSLATIONCONTEXT_HPP
+#define DLP_PARSER_SEMATRANSLATIONCONTEXT_HPP
+
 #include <memory>
 #include <cassert>
 #include <iostream>
@@ -54,3 +56,4 @@ namespace dlp {
 		};
 	}
 }
+#endif

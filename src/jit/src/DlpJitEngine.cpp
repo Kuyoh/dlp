@@ -86,6 +86,6 @@ void DlpJitEngine::run() {
 	//passManager->run(data->module, data->analysisManager);
 
 	using MainFuncType = void(*)();
-	MainFuncType mainFunc = (MainFuncType)data->jit.findSymbol(ENTRY_FUNC_NAME).getAddress(); //data->jit.findSymbol("main").getAddress();
+	MainFuncType mainFunc = (MainFuncType)data->jit.findSymbol(ENTRY_FUNC_NAME).getAddress().get(); //data->jit.findSymbol("main").getAddress();
 	mainFunc();
 }

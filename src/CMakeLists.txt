@@ -1,6 +1,8 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.1)
 
 project (dlp)
+
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(FLEX 2.5 REQUIRED)
 find_package(BISON 2.5 REQUIRED)

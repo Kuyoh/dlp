@@ -55,7 +55,7 @@ void SemaExprTranslator::visit(ast::HexLiteral &n) {
 	v.erase(std::remove(v.begin(), v.end(), '_'), v.end());
 
 	uint64_t intVal;
-	sscanf_s(v.c_str(), "%llx", &intVal);
+	sscanf(v.c_str(), "%llx", &intVal);
 	data->result = context.create<LiteralInt>(intVal, type);
 }
 
@@ -70,7 +70,7 @@ void SemaExprTranslator::visit(ast::OctalLiteral &n) {
 	v.erase(std::remove(v.begin(), v.end(), '_'), v.end());
 
 	uint64_t intVal;
-	sscanf_s(v.c_str(), "%llo", &intVal);
+	sscanf(v.c_str(), "%llo", &intVal);
 	data->result = context.create<LiteralInt>(intVal, type);
 }
 
@@ -85,7 +85,7 @@ void SemaExprTranslator::visit(ast::DecimalLiteral &n) {
 	v.erase(std::remove(v.begin(), v.end(), '_'), v.end());
 
 	uint64_t intVal;
-	sscanf_s(v.c_str(), "%llu", &intVal);
+	sscanf(v.c_str(), "%llu", &intVal);
 	data->result = context.create<LiteralInt>(intVal, type);
 }
 
@@ -100,7 +100,7 @@ void SemaExprTranslator::visit(ast::FloatLiteral &n) {
 	v.erase(std::remove(v.begin(), v.end(), '_'), v.end());
 
 	double floatVal;
-	sscanf_s(v.c_str(), "%lf", &floatVal);
+	sscanf(v.c_str(), "%lf", &floatVal);
     data->result = context.create<LiteralFloat>(floatVal, type);
 }
 void SemaExprTranslator::visit(ast::Identifier &n) {

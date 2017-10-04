@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_BUILTIN_HPP
+#define DLP_PARSER_BUILTIN_HPP
+
 #include "SemaTypes.hpp"
 
 namespace dlp {
@@ -6,3 +8,4 @@ namespace dlp {
 		Entity *resolveBuiltin(const std::string &name);
 	}
 }
+#endif

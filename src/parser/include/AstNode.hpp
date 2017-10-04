@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_ASTNODE_HPP
+#define DLP_PARSER_ASTNODE_HPP
+
 #include <memory>
 #include <string>
 #include <list>
@@ -25,3 +27,4 @@ namespace dlp {
 		struct IBlock : IStatement {};
 	}
 }
+#endif

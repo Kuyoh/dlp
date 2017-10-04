@@ -4,8 +4,8 @@
 %defines
 %define namespace "dlp"
 %define parser_class_name "Parser"
-
 %locations
+
 %glr-parser
 
 %code requires{
@@ -104,22 +104,8 @@
 
 %start program
 
-/*
-for scopeing take a look at clang:
-	https://clang.llvm.org/doxygen/classclang_1_1Scope.html#a11d6331901f84b04757fb829168ee861
-
-scoping is definetly part of the semantics, not the syntax!
-
-check output file using:
-.\win_bison.exe --output="parser.cpp" --defines="parser.hpp"  "parser.y" --report=state
-
-*/
 %%
 
-/*
-we need to separate type and identifiers!!!
-=> maybe simple allow identifier as both type and expression (need to adapt AST)?
-*/
 program : 
 		  | stmts { program->reset($1); $1 = nullptr; }
 		  ;
@@ -174,8 +160,6 @@ func_type_args_novaarg : /* no arguments */  { $$ = new VariableList(); }
 ident : TIDENTIFIER { $$ = new Identifier($1); }
 	  ;
 
-// does not work since we introduced type, because this ident cannot be distinguished from an ident in an expression!
-// maybe it is easier to solve if we put ambiguous grammas into a single rule
 type : ident { $$ = $1; }
 	 | func_type { $$ = $1; }
 	 | type TMUL { $$ = new PointerType($1); }
@@ -196,15 +180,6 @@ literal : THEXINT TIDENTIFIER { $$ = new HexLiteral($1, $2); }
 		| TSTRING TIDENTIFIER { $$ = new StringLiteral($1, $2); }
 		| TSTRING { $$ = new StringLiteral($1); }
 		;
-
-		/*
-method_call : TIDENTIFIER TLPAREN expr_list TRPAREN { $$ = new MethodCall($1, $3); }
-			;
-
-expr : method_call { $$ = $1; }
-	 | non_call_expr { $$ = $1; }
-	 ;
-	 */
 
 expr : ident { $$ = $1; }
 	 | TIDENTIFIER TLPAREN expr_list TRPAREN { $$ = new MethodCall($1, $3); }
@@ -252,7 +227,7 @@ void Parser::error( const dlp::Parser::location_type &l,
 
 
 /* include for access to scanner.yylex */
-#include "GenLexer.hpp"
+#include "DlpLexer.hpp"
 static int yylex(Parser::semantic_type *yylval, Parser::location_type *yylloc,
                  Lexer  &scanner, std::unique_ptr<dlp::ast::StatementList> *program)
 {

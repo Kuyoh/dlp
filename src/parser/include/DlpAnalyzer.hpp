@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DLP_PARSER_DLPANALYZER_HPP
+#define DLP_PARSER_DLPANALYZER_HPP
+
 #include <memory>
 #include "ast.hpp"
 #include "DlpParser.hpp"
@@ -20,3 +22,4 @@ protected:
 	struct Data;
 	std::unique_ptr<Data> data;
 };
+#endif
