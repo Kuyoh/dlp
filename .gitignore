@@ -1,6 +1,6 @@
-﻿.DS_Store
+﻿/test.gen
 .vscode
-test\.gen
+.DS_Store
 build/
 build64/
 build32/

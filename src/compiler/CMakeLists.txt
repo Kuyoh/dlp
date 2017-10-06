@@ -6,8 +6,6 @@ include_directories ("${PROJECT_SOURCE_DIR}/compiler/include")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-#set(LLVM_LIBS LLVMSupport LLVMCore LLVMInterpreter LLVMTarget LLVMObject LLVMTransformUtils LLVMX86AsmParser LLVMX86AsmPrinter LLVMX86CodeGen LLVMX86Desc LLVMX86Info LLVMMCJIT LLVMOrcJIT LLVMExecutionEngine LLVMRuntimeDyld)
-
 llvm_map_components_to_libnames(LLVM_LIBS support core interpreter irreader target object transformutils executionengine mcjit orcjit runtimedyld native nativecodegen x86asmparser x86asmprinter x86codegen x86desc x86disassembler x86info x86utils)
 # arch64 aarch64asmparser aarch64asmprinter aarch64codegen aarch64desc aarch64disassembler aarch64info
 # aarch64utils all all-targets amdgpu amdgpuasmparser amdgpuasmprinter amdgpucodegen amdgpudesc amdgpudisassembler
