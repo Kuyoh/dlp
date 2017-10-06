@@ -1,6 +1,6 @@
-﻿/build32/
-/build64/
-/build/
-\.DS_Store
+﻿\.DS_Store
 \.vscode
 test\.gen
+build/
+build64/
+build32/
