@@ -4,3 +4,5 @@
 build/
 build64/
 build32/
+
+parsed\.out

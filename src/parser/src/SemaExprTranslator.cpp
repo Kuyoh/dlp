@@ -81,7 +81,7 @@ void SemaExprTranslator::visit(ast::DecimalLiteral &n) {
 	else
 		type = context.create<TypeSymbol>("s32");
 
-	std::string v = n.value->substr(1);
+	std::string v = *n.value;
 	v.erase(std::remove(v.begin(), v.end(), '_'), v.end());
 
 	uint64_t intVal;
@@ -159,12 +159,25 @@ void SemaExprTranslator::visit(ast::DefinitionExpression &n) {
 
 			func->scope = context.pushScope();
             for (auto &a : fType->arguments) {
-                auto &es = context.nameEntity(a.name);
-                es.entity = context.create<Argument>(a.name, a.type);
+			//struct Argument { std::string name; Type *type = nullptr; Entity *defaultVal = nullptr; };
+				auto &es = context.nameEntity(a.name);
+				// type might not be set
+				// TODO: add mutable flag??
+				es.entity = context.create<Symbol>(a.name);
+				if (a.type != nullptr)
+					es.entity->type = a.type;
+				else
+					es.entity->type = context.create<DependentType>(a.defaultVal);
+                //es.entity = context.create<Argument>(a.name, a.type);
             }
             for (auto &a : fType->results) {
                 auto &es = context.nameEntity(a.name);
-                es.entity = context.create<Argument>(a.name, a.type);
+				es.entity = context.create<Symbol>(a.name);
+				if (a.type != nullptr)
+					es.entity->type = a.type;
+				else
+					es.entity->type = context.create<DependentType>(a.defaultVal);
+                //es.entity = context.create<Argument>(a.name, a.type);
             } // TODO: decide what to do about vararg
 		    data->stmt.process(n.statements);
             context.popScope();

@@ -7,7 +7,6 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Function.h>
-#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Verifier.h>
 //#include "TypeSystem.hpp"
@@ -15,105 +14,112 @@
 
 // look at https://github.com/ldc-developers/ldc for reference
 using namespace dlp;
-using namespace sema;
+using namespace dlp::sema;
+
+llvm::Value *CodeGenExpr::translateRead(sema::Entity &n) {
+	write = false;
+	n.visit(*this);
+	return result;
+}
+
+llvm::Value *CodeGenExpr::translateWrite(sema::Entity &n) {
+	write = true;
+	n.visit(*this);
+	return result;
+}
+
+void CodeGenExpr::visitDefault() { result = nullptr; }
+
+void CodeGenExpr::visit(Constant &n) {
+	n.expr->visit(*this);
+}
+void CodeGenExpr::visit(LiteralInt &n) {
+	if (n.llvmValue != nullptr) {
+		result = n.llvmValue;
+		return;
+	}
+
+	auto *llvmType = cgType.translate(n.type);
+	n.llvmValue = result = llvm::ConstantInt::get(llvmType, n.value, llvm::cast<IntType>(n.type)->isSigned);
+}
+void CodeGenExpr::visit(LiteralFloat &n) {
+	if (n.llvmValue != nullptr) {
+		result = n.llvmValue;
+		return;
+	}
+
+	n.llvmValue = result = llvm::ConstantFP::get(cgType.translate(n.type), n.value);
+	// TODO: handle special values....
+//static Constant * ConstantFP::getNaN (Type *Ty, bool Negative=false, unsigned type=0)
+//static Constant * ConstantFP::getNegativeZero (Type *Ty)
+//static Constant * ConstantFP::getInfinity (Type *Ty, bool Negative=false)
+}
+void CodeGenExpr::visit(LiteralString &n) {
+	if (n.llvmValue != nullptr) {
+		result = n.llvmValue;
+		return;
+	}
+
+	n.llvmValue = result = builder.CreateGlobalStringPtr(n.value);
+}
+
+void CodeGenExpr::visit(CallExpr &n) {
+	std::vector<llvm::Value*> args;
+	args.reserve(n.arguments.size());
+	for (auto a : n.arguments)
+		args.push_back(translateRead(*a));
+	
+	// TODO: resolve func n.func
+	// TODO: handle intrinsics (especially operators)
+	// TODO: handle function objects
+	result = cgFunc.translateCall(n.func, args);
+	//llvm::Function *func = cgFunc.translate(n.func);
+	//llvm::Function *func = resolveFunc(n.func);
+	//result = builder.CreateCall(func, args);
+	//builder.CreateCall()
+}
+
+void CodeGenExpr::visit(Symbol &n) {
+	if (write) // resolve to address
+		result = n.llvmAddress; // llvmAddress needed to be set at function level!
+	else // resolve to value
+		result = builder.CreateLoad(n.llvmAddress);
+}
+void CodeGenExpr::visit(MemAccessExpr &n) {
+	llvm::Value *object = translateRead(*n.object);
+	auto *st = llvm::dyn_cast<StructType>(n.object->type);
+	llvm::Value *addr = nullptr;
+	if (st != nullptr) {
+		auto it = std::find_if(st->attributes.begin(), st->attributes.end(), [&](auto &a){ return a.name == n.memName; });
+		if (it != st->attributes.end()) {
+			size_t idx = it - st->attributes.begin();
+	
+			addr = builder.CreateStructGEP(st->llvmType, addr, idx);
+			//std::vector<llvm::Value*> indices = { builder.getInt32(0), builder.getInt32(idx) };
+			//std::vector<Value*> indices = { builder.getInt64(0), builder.getInt64(idx) };
+			//addr = builder.CreateGEP(addr, indices);
+		}
+	}
+	// TODO: else check builtin
+
+	if (write) // resolve to address
+		result = addr;
+	else // resolve to value
+		result = builder.CreateLoad(addr);
+}
+
+// void visit(TypeType &n) { visitDefault(); }
+// void visit(BoolType &n) { visitDefault(); }
+// void visit(IntType &n) { visitDefault(); }
+// void visit(FloatType &n) { visitDefault(); }
+// void visit(StringType &n) { visitDefault(); }
+// void visit(FunctionType &n) { visitDefault(); }
+// void visit(PointerType &n) { visitDefault(); }
+// void visit(StructType &n) { visitDefault(); }
+// void visit(TypeSymbol &n) { visitDefault(); }
+// void visit(DependentType &n) { visitDefault(); }
 
 /*
-struct Scope {
-	Scope *parent = nullptr;
-	llvm::BasicBlock *block = nullptr;
-	llvm::StringMap<std::shared_ptr<Entity>> namedValues;
-	std::list<Scope> subScopes;
-	//StructType *definingType = nullptr;
-	//Value *self = nullptr;
-
-	Scope *addScope(llvm::BasicBlock *block) {
-		subScopes.emplace_back(Scope{ this, block });
-		return &(subScopes.back());
-	}
-
-	llvm::BasicBlock *getBlock() {
-		Scope *s = this;
-		while (s->block == nullptr) s = s->parent;
-		return s->block;
-	}
-
-	std::shared_ptr<Entity> findName(const std::string &name) {
-		Scope *sc = this;
-		do {
-			auto it = sc->namedValues.find(name);
-			if (it != sc->namedValues.end())
-				return it->second;
-			sc = sc->parent;
-		} while (sc != nullptr);
-		return nullptr;
-	}
-};
-
-struct TypeVisitor : ast::Visitor {
-	TypeVisitor(llvm::IRBuilder<> &builder, Scope *&currentScope) : builder(builder), currentScope(currentScope) {
-		builtinTypes["u8"] = std::make_shared<BasicType>(builder.getInt8Ty(), false);
-		builtinTypes["u16"] = std::make_shared<BasicType>(builder.getInt16Ty(), false);
-		builtinTypes["u32"] = std::make_shared<BasicType>(builder.getInt32Ty(), false);
-		builtinTypes["u64"] = std::make_shared<BasicType>(builder.getInt64Ty(), false);
-		builtinTypes["s8"] = std::make_shared<BasicType>(builder.getInt8Ty(), true);
-		builtinTypes["s16"] = std::make_shared<BasicType>(builder.getInt16Ty(), true);
-		builtinTypes["s32"] = std::make_shared<BasicType>(builder.getInt32Ty(), true);
-		builtinTypes["s64"] = std::make_shared<BasicType>(builder.getInt64Ty(), true);
-		builtinTypes["f32"] = std::make_shared<BasicType>(builder.getFloatTy(), true);
-		builtinTypes["f64"] = std::make_shared<BasicType>(builder.getDoubleTy(), true);
-		builtinTypes["struct"] = StructType::create(builder.getContext(), {});
-		//builtinTypes["int"] = builder.getInt32Ty();
-		//builtinTypes["double"] = builder.getDoubleTy();
-	}
-
-	virtual void visit(ast::Identifier &n) {
-		result = resolveTypeSymbol(*n.name);
-		if (result) return;
-		auto it = builtinTypes.find(*n.name);
-		if (it != builtinTypes.end())
-			result = it->second;
-	}
-	virtual void visit(ast::PointerType &n) {
-		n.type->visit(*this);
-		if (result)
-			result.reset(new PointerType(result->getType()->getPointerTo()));
-	}
-	virtual void visit(ast::FunctionType &n) {
-		std::shared_ptr<Type> resultType;
-		result = nullptr;
-		if (n.outArguments.size() > 0) {
-			n.outArguments.front()->type->visit(*this);
-			resultType = result;
-		}
-		else
-			resultType = std::make_shared<BasicType>(builder.getVoidTy(), false);
-
-		// take a look at:
-		// https://users.rust-lang.org/t/data-structures-for-high-performance-code/7508
-
-		std::vector<llvm::Type*> argTypes(n.arguments.size());
-		auto it = n.arguments.begin();
-		for (int i = 0; i < argTypes.size(); ++i, ++it) {
-			result = nullptr;
-			(*it)->type->visit(*this);
-			argTypes[i] = result->getType();
-		}
-		result = FunctionType::create(resultType->getType(), makeArrayRef(argTypes), n.arguments.isVarArg);
-	}
-
-	std::shared_ptr<Type> resolveTypeSymbol(std::string &name) {
-		auto sym = currentScope->findName(name);
-		if (sym && llvm::isa<Type>(sym.get()))
-			return std::static_pointer_cast<Type>(sym);
-		return nullptr;
-	}
-
-	llvm::StringMap<std::shared_ptr<Type>> builtinTypes;
-	llvm::IRBuilder<> &builder;
-	Scope *&currentScope;
-	std::shared_ptr<Type> result;
-};
-
 struct CodeGenVisitor : public ast::Visitor {
 	llvm::LLVMContext &context;
 	llvm::IRBuilder<> builder;
@@ -706,3 +712,4 @@ void DlpCodeGen::build(DlpAnalyzer::Program &ast, llvm::Module *module) {
 	//bblock->getTerminator()
 }
 /**/
+

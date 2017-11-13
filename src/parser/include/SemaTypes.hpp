@@ -9,11 +9,12 @@ namespace dlp {
 	namespace sema {
 		struct Scope;
 		struct Type : Entity {
-			enum Bitness { B8, B16, B32, B64, B128 };
+			enum Bitness { B8 = 8, B16 = 16, B32 = 32, B64 = 64, B128 = 128 };
 
 			static bool classof(const Entity *e) {
 				return e->getKind() >= Kind::TYPETYPE && e->getKind() <= Kind::DEPENDENTTYPE;
 			}
+			llvm::Type *llvmType = nullptr;
 
 		protected:
 			Type(Kind kind) : Entity(kind) {

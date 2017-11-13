@@ -25,8 +25,6 @@ namespace dlp {
 			void visit(TypeSymbol &n) override;
             void visit(DependentType &n) override;
             
-			//void visit(Argument &n) override;
-			//void visit(Variable &n) override;
 			//void visit(Constant &n) override;
 			void visit(Function &n) override;
 			//void visit(ImportedFunction &n) override;

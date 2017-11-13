@@ -4,6 +4,11 @@
 #include <vector>
 #include "SemaEntityVisitor.hpp"
 
+namespace llvm {
+	class Value;
+	class Type;
+}
+
 namespace dlp {
 	namespace sema {
 		struct Type;
@@ -17,8 +22,6 @@ namespace dlp {
 				OVERLOADEDENTITY,
 
 				// Values
-				ARGUMENT,
-				VARIABLE,
 				CONSTANT,
 				
 				LITERALINT,
@@ -52,22 +55,6 @@ namespace dlp {
 		};
 
 		// Values
-		struct Argument : Entity {
-			Argument(std::string name, Type *type = nullptr) : Entity(Kind::ARGUMENT), name(name) { this->type = type; }
-			void visit(SemaEntityVisitor &v) override { v.visit(*this); }
-			static bool classof(const Entity *e) {
-				return e->getKind() == Kind::ARGUMENT;
-			}
-			std::string name;
-		};
-		struct Variable : Entity {
-			Variable(std::string name) : Entity(Kind::VARIABLE), name(name) {}
-			void visit(SemaEntityVisitor &v) override { v.visit(*this); }
-			static bool classof(const Entity *e) {
-				return e->getKind() == Kind::VARIABLE;
-			}
-			std::string name;
-		};
 		struct Constant : Entity {
 			Constant(std::string name) : Entity(Kind::CONSTANT), name(name) {}
 			void visit(SemaEntityVisitor &v) override { v.visit(*this); }
@@ -76,6 +63,19 @@ namespace dlp {
 			}
 			std::string name;
 			Entity *expr = nullptr;
+		};
+
+		struct Symbol : Entity {
+			Symbol(std::string name) :
+				Entity(Kind::SYMBOL), name(name) {
+			}
+			void visit(SemaEntityVisitor &v) override { v.visit(*this); }			
+			static bool classof(const Entity *e) {
+				return e->getKind() == Kind::SYMBOL;
+			}
+			std::string name;
+			//Entity *entity = nullptr;
+			llvm::Value *llvmAddress = nullptr;
 		};
 
 		// Constants
@@ -88,6 +88,7 @@ namespace dlp {
 				return e->getKind() == Kind::LITERALINT;
 			}
 			const uint64_t value;
+			llvm::Value *llvmValue = nullptr;
 		};
 		struct LiteralFloat : Entity {
 			LiteralFloat(double value, Type *type) : Entity(Kind::LITERALDOUBLE), value(value) {
@@ -98,6 +99,7 @@ namespace dlp {
 				return e->getKind() == Kind::LITERALDOUBLE;
 			}
 			const double value;
+			llvm::Value *llvmValue = nullptr;
 		};
 		struct LiteralString : Entity {
 			LiteralString(const std::string &value, Type *type) : Entity(Kind::LITERALSTRING), value(value) {
@@ -108,6 +110,7 @@ namespace dlp {
 				return e->getKind() == Kind::LITERALSTRING;
 			}
 			const std::string value;
+			llvm::Value *llvmValue = nullptr;
 		};
 
 		struct OverloadedEntity : Entity {

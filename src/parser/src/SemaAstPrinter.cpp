@@ -14,9 +14,6 @@ struct EntityPrinter : SemaEntityVisitor {
 
 	void printEntity(const char *name, Entity &e);
 
-	void visit(Argument &n) override;
-	void visit(Variable &n) override;
-
 	void visit(Constant &n) override;
 	void visit(LiteralInt &n) override;
 	void visit(LiteralFloat &n) override;
@@ -126,48 +123,45 @@ void EntityPrinter::printEntity(const char *name, Entity &e) {
 	context.endNode();
 }
 
-void EntityPrinter::visit(Argument &n) {
-	context.startNode("ARG");
-	context.printNamedValue("NAME", n.name.c_str());
-	if (n.type != nullptr)
-		context.printNamedValue("TYPE", n.type);
-	context.endNode();
-}
-void EntityPrinter::visit(Variable &n) {
-	context.startNode("VAR");
-	context.printNamedValue("NAME", n.name.c_str());
-	if (n.type != nullptr)
-		context.printNamedValue("TYPE", n.type);
-	context.endNode();
-}
-
 void EntityPrinter::visit(Constant &n) {
 	context.startNode("CONSTANT");
 	context.printNamedValue("NAME", n.name.c_str());
-	if (n.type != nullptr)
-		context.printNamedValue("TYPE", n.type);
+	if (n.type != nullptr) {
+		context.startNode("TYPE");
+		n.type->visit(*this);
+		context.endNode();
+	}
 	printEntity("EXPR", *n.expr);
 	context.endNode();
 }
 void EntityPrinter::visit(LiteralInt &n) {
 	context.startNode("LITERAL");
 	context.printNamedValue("VALUE", n.value);
-	if (n.type != nullptr)
-		context.printNamedValue("TYPE", n.type);
+	if (n.type != nullptr) {
+		context.startNode("TYPE");
+		n.type->visit(*this);
+		context.endNode();
+	}
 	context.endNode();
 }
 void EntityPrinter::visit(LiteralFloat &n) {
 	context.startNode("LITERAL");
 	context.printNamedValue("VALUE", n.value);
-	if (n.type != nullptr)
-		context.printNamedValue("TYPE", n.type);
+	if (n.type != nullptr) {
+		context.startNode("TYPE");
+		n.type->visit(*this);
+		context.endNode();
+	}
 	context.endNode();
 }
 void EntityPrinter::visit(LiteralString &n) {
 	context.startNode("LITERAL");
 	context.printNamedValue("VALUE", n.value.c_str());
-	if (n.type != nullptr)
-		context.printNamedValue("TYPE", n.type);
+	if (n.type != nullptr) {
+		context.startNode("TYPE");
+		n.type->visit(*this);
+		context.endNode();
+	}
 	context.endNode();
 }
 
@@ -271,10 +265,10 @@ void EntityPrinter::visit(Symbol &n) {
 	context.startNode("SYMBOL");
 
 	context.printNamedValue("NAME", n.name.c_str());
-	if (n.entity != nullptr)
-		printEntity("VALUE", *n.entity);
-	if (n.type != nullptr)
-		printEntity("RESOLVEDTYPE", *n.type);
+	// if (n.entity != nullptr)
+	//	printEntity("VALUE", *n.entity);
+	// if (n.type != nullptr)
+		printEntity("TYPE", *n.type);
 
 	context.endNode();
 }

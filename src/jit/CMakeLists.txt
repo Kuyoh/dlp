@@ -9,5 +9,6 @@ include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
 file(GLOB jit_SOURCE_FILES src/*.cpp)
+file(GLOB jit_SOURCE_FILES2 src/*/*.cpp)
 file(GLOB jit_HEADER_FILES include/*.hpp)
-add_library(dlpjit STATIC ${jit_SOURCE_FILES} ${jit_HEADER_FILES})
+add_library(dlpjit STATIC ${jit_SOURCE_FILES} ${jit_SOURCE_FILES2} ${jit_HEADER_FILES})

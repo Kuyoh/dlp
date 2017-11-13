@@ -1,3 +1,4 @@
+#define DLP_BUILD_JIT
 #include "DlpJitEngine.hpp"
 #include "DlpParser.hpp"
 #include <llvm/IR/BasicBlock.h>

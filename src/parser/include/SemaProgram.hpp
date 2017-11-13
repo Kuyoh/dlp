@@ -11,7 +11,7 @@ namespace dlp {
 	namespace sema {
 		struct Scope {
 			struct EntitySlot { Entity *entity; };
-			std::list<Variable*> variables;
+			std::list<Symbol*> variables;
 			std::unordered_map<std::string, EntitySlot> namedEntities;
 			std::list<std::unique_ptr<Statement>> statements;
 			std::list<std::unique_ptr<Entity>> entities;

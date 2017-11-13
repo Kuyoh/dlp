@@ -5,6 +5,11 @@
 #include <vector>
 #include "SemaTypes.hpp"
 
+namespace llvm {
+	struct Function;
+	struct Value;
+}
+
 namespace dlp {
 	namespace sema {
 		struct Scope;
@@ -24,6 +29,7 @@ namespace dlp {
 				return e->getKind() == Kind::FUNCTION;
 			}
 			Scope *scope;
+			llvm::Function *llvmFunction;
 		};
 		struct ImportedFunction : IFunction {
 			ImportedFunction(FunctionType *type) : IFunction(Kind::IMPORTEDFUNCTION, type) {}
@@ -33,18 +39,6 @@ namespace dlp {
 			}
 			Entity *libName = nullptr;
 			Entity *funcName = nullptr;
-		};
-
-		struct Symbol : Entity {
-			Symbol(std::string name) :
-				Entity(Kind::SYMBOL), name(name) {
-			}
-			void visit(SemaEntityVisitor &v) override { v.visit(*this); }			
-			static bool classof(const Entity *e) {
-				return e->getKind() == Kind::SYMBOL;
-			}
-			std::string name;
-			Entity *entity = nullptr;
 		};
 		// Expression
 		struct CallExpr : Entity {
@@ -56,7 +50,7 @@ namespace dlp {
 				return e->getKind() == Kind::CALL;
 			}
 			std::string funcName;
-			Function *func = nullptr;
+			IFunction *func = nullptr;
 			Entity *funcEntity = nullptr;
 			std::vector<Entity*> arguments;
 		};

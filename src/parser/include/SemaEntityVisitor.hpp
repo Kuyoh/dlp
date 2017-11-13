@@ -3,8 +3,6 @@
 
 namespace dlp {
     namespace sema {
-		struct Argument;
-		struct Variable;
 		struct Constant;
 		struct LiteralInt;
 		struct LiteralFloat;
@@ -33,8 +31,6 @@ namespace dlp {
             virtual ~SemaEntityVisitor() = default;
             virtual void visitDefault() {}
             
-			virtual void visit(Argument &n) { visitDefault(); }
-			virtual void visit(Variable &n) { visitDefault(); }
 			virtual void visit(Constant &n) { visitDefault(); }
 			virtual void visit(LiteralInt &n) { visitDefault(); }
 			virtual void visit(LiteralFloat &n) { visitDefault(); }

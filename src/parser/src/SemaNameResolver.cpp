@@ -7,23 +7,60 @@ using namespace dlp;
 using namespace sema;
 
 struct SemaNameResolver::Data {
+	SemaTranslationContext &context;
 	Scope *scope = nullptr;
+
+	Data(SemaTranslationContext &context) : context(context) {}
+
+	// TODO: start implementing codegen, so that we find the requirements..
+	Entity *resolveEntity(const std::string &name) {
+		Scope *s = scope;
+		while (s != nullptr) {
+			auto it = s->namedEntities.find(name);
+			if (it != s->namedEntities.end())
+				return it->second.entity;
+			s = s->parent;
+		}
+		return resolveBuiltin(name);
+	}
 	Type *resolveType(Type *type) {
-		if (TypeSymbol::classof(type))
-			return resolveType(((TypeSymbol*)type)->resolvedType);
+		if (TypeSymbol::classof(type)) {
+			TypeSymbol *sym = (TypeSymbol*)type;
+			if (sym->resolvedType == nullptr) {
+				auto *entity = resolveEntity(sym->name);
+				if (entity == nullptr) {
+					context.logError("Unresolved symbol");
+					return type;
+				}
+				if (!Type::classof(entity)) {
+					context.logError("Symbol does not name a type");
+					return type;
+				}
+				sym->resolvedType = (Type*)entity;
+			}
+			return sym->resolvedType;
+		}
 		else if (DependentType::classof(type))
 			return resolveType(((DependentType*)type)->dependency->type);
 		else
 			return type;
 	}
 	Entity *resolveEntity(Entity *entity) {
-		if (Symbol::classof(entity))
-			return ((Symbol*)entity)->entity;
+		if (Symbol::classof(entity)) {
+			Symbol *sym = (Symbol*)entity;
+			//if (sym->entity == nullptr) {
+			//	sym->entity = resolveEntity(sym->name);
+			//	if (sym->entity)
+			//		context.logError("Unresolved symbol");
+			//}
+		}
+		if (Type::classof(entity))
+			return resolveType((Type*)entity);
 		return entity;
 	}
 };
 
-SemaNameResolver::SemaNameResolver(SemaTranslationContext &context) : context(context), data(new Data) {}
+SemaNameResolver::SemaNameResolver(SemaTranslationContext &context) : context(context), data(new Data(context)) {}
 SemaNameResolver::~SemaNameResolver() {}
 
 void SemaNameResolver::visit(Scope *s) {
@@ -95,7 +132,7 @@ void SemaNameResolver::visit(StructType &n) {
 
 void SemaNameResolver::visit(TypeSymbol &n) {
 	if (n.resolvedType != nullptr) {
-		auto *entity = context.resolveEntity(n.name);
+		auto *entity = data->resolveEntity(n.name);
 		if (entity != nullptr) {
 			entity->visit(*this);
 			entity = data->resolveEntity(entity);
@@ -135,16 +172,20 @@ void SemaNameResolver::visit(OverloadedEntity &n) {
 }
 
 void SemaNameResolver::visit(Symbol &n) {
-	if (n.entity != nullptr)
-		return;
-	auto *entity = context.resolveEntity(n.name);
-	if (entity == nullptr) {
-		context.logError("unresolved symbol");
-		return;
-	}
-	n.entity = entity;
-	entity->visit(*this);
-	n.type = entity->type;
+	
+	//if (n.entity != nullptr)
+	//	return;
+	//auto *entity = data->resolveEntity(n.name);
+	//if (entity == nullptr) {
+	//	context.logError("unresolved symbol");
+	//	return;
+	//}
+	//n.entity = entity;
+	//entity->visit(*this);
+	//if (n.type != nullptr)
+		n.type = data->resolveType(n.type);
+	//else
+	//	n.type = data->resolveType(n.entity->type);
 }
 
 void SemaNameResolver::visit(CallExpr &n) {
@@ -156,17 +197,17 @@ void SemaNameResolver::visit(CallExpr &n) {
 		a->visit(*this);
 		argTypes.emplace_back(a->type);
 	}
-	auto *entity = context.resolveEntity(n.funcName);
+	auto *entity = data->resolveEntity(n.funcName);
 	if (entity != nullptr) {
 		entity->visit(*this);
 		FunctionType *fType = nullptr;
 		if (OverloadedEntity::classof(entity)) {
 			auto *oe = (OverloadedEntity*)entity;
 			int idx = selectOverload(argTypes, oe->overloads);
-
-			// TODO: implement overload resolution here
-			//oe->overloads
-			//fType = ??
+			n.funcEntity = oe->entities[idx];
+			fType = oe->overloads[idx];
+			// TODO: assert arg type compatibility!
+			// OR unify this with overloading...
 		}
 		else if (FunctionType::classof(entity->type)) {
 			n.funcEntity = entity;

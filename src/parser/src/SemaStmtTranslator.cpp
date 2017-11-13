@@ -1,6 +1,7 @@
 #include "SemaStmtTranslator.hpp"
 #include "SemaExprTranslator.hpp"
 #include "SemaTypeTranslator.hpp"
+#include "SemaNameResolver.hpp"
 
 using namespace dlp;
 using namespace dlp::sema;
@@ -24,6 +25,8 @@ Type *SemaStmtTranslator::translateType(ast::IType &type) {
 void SemaStmtTranslator::process(ast::StatementList &stmts) {
 	for (auto &s : stmts)
 		s->visit(*this);
+	SemaNameResolver resolver(context);
+	resolver.visit(context.currentScope);
 }
 
 std::unique_ptr<Program> SemaStmtTranslator::getProgram() {
@@ -88,7 +91,8 @@ void SemaStmtTranslator::visit(ast::VariableDefinition &n) {
 	if (slot.entity)
 		context.logError("redefinition of entity");
 	else {
-		auto *v = context.create<Variable>(*n.id);
+		auto *v = context.create<Symbol>(*n.id);
+		context.currentScope->variables.push_back(v);
 		slot.entity = v;
 		Entity *rhs = nullptr;
 		if (n.assignmentExpr) {

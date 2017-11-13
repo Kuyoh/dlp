@@ -29,16 +29,6 @@ namespace dlp {
 			Scope::EntitySlot &nameEntity(const std::string &name) {
 				return currentScope->namedEntities[name];
 			}
-			Entity *resolveEntity(const std::string &name) {
-				Scope *s = currentScope;
-				while (s != nullptr) {
-					auto it = s->namedEntities.find(name);
-					if (it != s->namedEntities.end())
-						return it->second.entity;
-					s = s->parent;
-				}
-				return resolveBuiltin(name);
-			}
 
 			template <typename T, typename... Args>
 			T *addStatement(Args&&... args) {
